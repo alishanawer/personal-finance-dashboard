@@ -44,7 +44,7 @@ const Hero = () => {
               </p>
             </div>
             <div className="mt-6 flex justify-center gap-3">
-              <Link to="/dashboard">
+              <Link to="/login">
                 <Button className="shadow-sm transition-shadow hover:shadow">
                   Get Started
                 </Button>
@@ -54,7 +54,7 @@ const Hero = () => {
                 variant="outline"
                 className="group">
                 <Github className="h-4 transition-transform group-hover:translate-x-0.5" />{" "}
-                View on GitHub
+                Star on GitHub
               </Button>
             </div>
             <div className="mt-15 flex flex-col items-center gap-5">
