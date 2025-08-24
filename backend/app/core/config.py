@@ -6,6 +6,11 @@ class Settings(BaseSettings):
     debug: bool = True
     database_url: str
 
+    # Auth configs
+    secret_key: str
+    algorithm: str = "HS256"
+    access_token_expire_minutes: int = 60
+
     class Config:
         env_file = ".env"
 
