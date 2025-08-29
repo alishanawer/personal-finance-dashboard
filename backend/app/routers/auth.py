@@ -1,8 +1,9 @@
+# routers/auth.py
 from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi.security import OAuth2PasswordRequestForm
 from sqlalchemy.orm import Session
 
 from app.api.deps import get_db
-from app.api.deps_auth import get_current_user
 from app.core.security import create_access_token, hash_password, verify_password
 from app.models.user import User
 
@@ -27,26 +28,38 @@ def signup(username: str, email: str, password: str, db: Session = Depends(get_d
     db.commit()
     db.refresh(new_user)
 
-    return {"message": "User created successfully", "user_id": new_user.id}
+    # generate JWT (log them in immediately)
+    access_token = create_access_token({"sub": str(new_user.id)})
+
+    return {
+        "message": "User created successfully",
+        "access_token": access_token,
+        "token_type": "bearer",
+    }
 
 
 @router.post("/login")
-def login(email: str, password: str, db: Session = Depends(get_db)):
+def login(
+    form_data: OAuth2PasswordRequestForm = Depends(),
+    db: Session = Depends(get_db),
+):
+    # NOTE: OAuth2PasswordRequestForm provides fields:
+    #   - username  (we'll use this as "email")
+    #   - password
+    #   - scope(s)  (ignored for now)
+    email = form_data.username
+    password = form_data.password
+
     # Find user by email
     user = db.query(User).filter(User.email == email).first()
-    if not user:
+    if not user or not verify_password(password, user.hashed_password):
         raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid email or password"
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Invalid email or password",
+            headers={"WWW-Authenticate": "Bearer"},
         )
 
-    # Verify password
-    if not verify_password(password, user.hashed_password):
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid email or password"
-        )
-
-    # Create JWT token
+    # Create JWT token (subject = user.id)
     access_token = create_access_token({"sub": str(user.id)})
 
-    # Return token
     return {"access_token": access_token, "token_type": "bearer"}
