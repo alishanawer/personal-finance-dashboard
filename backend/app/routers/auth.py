@@ -1,9 +1,11 @@
-# routers/auth.py
+from datetime import timedelta
+
 from fastapi import APIRouter, Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordRequestForm
 from sqlalchemy.orm import Session
 
 from app.api.deps import get_db
+from app.core.config import settings
 from app.core.security import create_access_token, hash_password, verify_password
 from app.models.user import User
 
@@ -29,7 +31,10 @@ def signup(username: str, email: str, password: str, db: Session = Depends(get_d
     db.refresh(new_user)
 
     # generate JWT (log them in immediately)
-    access_token = create_access_token({"sub": str(new_user.id)})
+    access_token_expires = timedelta(minutes=settings.access_token_expire_minutes)
+    access_token = create_access_token(
+        data={"sub": str(new_user.id)}, expires_delta=access_token_expires
+    )
 
     return {
         "message": "User created successfully",
@@ -60,6 +65,9 @@ def login(
         )
 
     # Create JWT token (subject = user.id)
-    access_token = create_access_token({"sub": str(user.id)})
+    access_token_expires = timedelta(minutes=settings.access_token_expire_minutes)
+    access_token = create_access_token(
+        data={"sub": str(user.id)}, expires_delta=access_token_expires
+    )
 
     return {"access_token": access_token, "token_type": "bearer"}
