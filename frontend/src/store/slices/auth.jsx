@@ -34,18 +34,21 @@ const createAuthSlice = (set, get) => ({
   signup: async (credentials) => {
     try {
       const res = await api.post("/auth/signup", credentials);
-      const { access_token } = res.data;
+      const { access_token, user } = res.data;
 
+      // persist to localStorage
       localStorage.setItem("accessToken", access_token);
-      localStorage.setItem("user", JSON.stringify(null));
+      localStorage.setItem("user", JSON.stringify(user));
 
+      // set default auth header
       api.defaults.headers.common["Authorization"] = `Bearer ${access_token}`;
 
+      // update state
       set({
         auth: {
           isAuthenticated: true,
           accessToken: access_token,
-          user: null,
+          user,
           rehydrated: true,
         },
       });
@@ -69,10 +72,10 @@ const createAuthSlice = (set, get) => ({
         }
       );
 
-      const { access_token } = res.data;
+      const { access_token, user } = res.data;
 
       localStorage.setItem("accessToken", access_token);
-      localStorage.setItem("user", JSON.stringify(null));
+      localStorage.setItem("user", JSON.stringify(user));
 
       api.defaults.headers.common["Authorization"] = `Bearer ${access_token}`;
 
@@ -80,7 +83,7 @@ const createAuthSlice = (set, get) => ({
         auth: {
           isAuthenticated: true,
           accessToken: access_token,
-          user: null,
+          user,
           rehydrated: true,
         },
       });

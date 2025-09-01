@@ -1,15 +1,15 @@
-import { Navigate } from "react-router-dom";
 import useStore from "../store";
+import { Navigate } from "react-router-dom";
 
 function ProtectedRoute({ children }) {
-  const { isAuthenticated, rehydrated } = useStore((state) => state.auth);
+  const { isAuthenticated, rehydrated, user } = useStore((state) => state.auth);
 
   // If still rehydrating, show nothing (or a loader/spinner)
   if (!rehydrated) {
     return <div>Loading...</div>;
   }
 
-  if (!isAuthenticated) {
+  if (!isAuthenticated || !user) {
     return <Navigate to="/login" replace />;
   }
 
