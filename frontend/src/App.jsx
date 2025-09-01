@@ -1,4 +1,6 @@
+import useStore from "./store";
 import Home from "./pages/home";
+import { useEffect } from "react";
 import LoginPage from "./pages/login";
 import SignupPage from "./pages/signup";
 import ReportsPage from "./pages/reports";
@@ -9,6 +11,12 @@ import { ThemeProvider } from "./components/theme-provider";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 
 function App() {
+  const rehydrateAuth = useStore((state) => state.rehydrateAuth);
+
+  useEffect(() => {
+    rehydrateAuth();
+  }, []);
+
   return (
     <ThemeProvider defaultTheme="system" storageKey="vite-ui-theme">
       <BrowserRouter>
