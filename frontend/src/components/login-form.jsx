@@ -11,19 +11,21 @@ import { useState } from "react";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 
 export function LoginForm({ className, ...props }) {
+  const navigate = useNavigate();
+  const location = useLocation();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const login = useStore((state) => state.login);
-  const navigate = useNavigate();
+  const from = location.state?.from?.pathname || "/dashboard";
 
   const handleLogin = async (e) => {
     e.preventDefault();
     try {
       await login({ email, password });
-      navigate("/dashboard");
+      navigate(from, { replace: true }); // go back to where user wanted to go
     } catch (err) {
       console.error("Login failed:", err);
     }

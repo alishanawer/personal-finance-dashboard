@@ -7,6 +7,7 @@ import ReportsPage from "./pages/reports";
 import SettingsPage from "./pages/settings";
 import DashboardPage from "./pages/dashboard";
 import TransactionsPage from "./pages/transactions";
+import ProtectedRoute from "./components/protected-routes";
 import { ThemeProvider } from "./components/theme-provider";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 
@@ -21,13 +22,43 @@ function App() {
     <ThemeProvider defaultTheme="system" storageKey="vite-ui-theme">
       <BrowserRouter>
         <Routes>
+          {/* Public routes */}
           <Route path="/" element={<Home />} />
           <Route path="/login" element={<LoginPage />} />
           <Route path="/signup" element={<SignupPage />} />
-          <Route path="/dashboard" element={<DashboardPage />} />
-          <Route path="/settings" element={<SettingsPage />} />
-          <Route path="/transactions" element={<TransactionsPage />} />
-          <Route path="/reports" element={<ReportsPage />} />
+          {/* Protected routes */}
+          <Route
+            path="/dashboard"
+            element={
+              <ProtectedRoute>
+                <DashboardPage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/settings"
+            element={
+              <ProtectedRoute>
+                <SettingsPage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/transactions"
+            element={
+              <ProtectedRoute>
+                <TransactionsPage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/reports"
+            element={
+              <ProtectedRoute>
+                <ReportsPage />
+              </ProtectedRoute>
+            }
+          />
         </Routes>
       </BrowserRouter>
     </ThemeProvider>
