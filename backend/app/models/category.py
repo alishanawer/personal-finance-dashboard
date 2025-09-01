@@ -1,4 +1,4 @@
-from sqlalchemy import Column, Enum, ForeignKey, Integer, String
+from sqlalchemy import Column, Enum, ForeignKey, Integer, String, UniqueConstraint
 from sqlalchemy.orm import relationship
 
 from app.database.database import Base
@@ -17,4 +17,8 @@ class Category(Base):
 
     transactions = relationship(
         "Transaction", back_populates="category", cascade="all, delete-orphan"
+    )
+
+    __table_args__ = (
+        UniqueConstraint("user_id", "name", name="uq_user_category_name"),
     )
