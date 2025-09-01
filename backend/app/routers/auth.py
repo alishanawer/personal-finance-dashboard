@@ -13,6 +13,15 @@ from app.schemas.user import UserCreate
 router = APIRouter(prefix="/auth", tags=["auth"])
 
 
+def user_response(user: User):
+    """Utility function to control which user fields are sent to client"""
+    return {
+        "id": user.id,
+        "username": user.username,
+        "email": user.email,
+    }
+
+
 @router.post("/signup", status_code=status.HTTP_201_CREATED)
 def signup(user: UserCreate, db: Session = Depends(get_db)):
     # check if user already exists
@@ -33,7 +42,7 @@ def signup(user: UserCreate, db: Session = Depends(get_db)):
     db.commit()
     db.refresh(new_user)
 
-    # generate JWT (log them in immediately) with configured expiry
+    # generate JWT
     access_token_expires = timedelta(minutes=settings.access_token_expire_minutes)
     access_token = create_access_token(
         data={"sub": str(new_user.id)}, expires_delta=access_token_expires
@@ -43,6 +52,7 @@ def signup(user: UserCreate, db: Session = Depends(get_db)):
         "message": "User created successfully",
         "access_token": access_token,
         "token_type": "bearer",
+        "user": user_response(new_user),
     }
 
 
@@ -67,4 +77,8 @@ def login(
         data={"sub": str(user.id)}, expires_delta=access_token_expires
     )
 
-    return {"access_token": access_token, "token_type": "bearer"}
+    return {
+        "access_token": access_token,
+        "token_type": "bearer",
+        "user": user_response(user),
+    }
