@@ -7,6 +7,7 @@ import ReportsPage from "./pages/reports";
 import SettingsPage from "./pages/settings";
 import DashboardPage from "./pages/dashboard";
 import TransactionsPage from "./pages/transactions";
+import CategoriesPage from "./pages/categories/categories";
 import ProtectedRoute from "./components/protected-routes";
 import { ThemeProvider } from "./components/theme-provider";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
@@ -48,6 +49,14 @@ function App() {
             element={
               <ProtectedRoute>
                 <TransactionsPage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/categories"
+            element={
+              <ProtectedRoute>
+                <CategoriesPage />
               </ProtectedRoute>
             }
           />
