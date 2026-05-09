@@ -54,9 +54,10 @@ Your frontend should now be running on `http://localhost:5173`
 ```bash
 cd ../backend
 ```
+- Use Python 3.11 or 3.12 (psycopg2-binary wheels are not available for Python 3.14 yet):
 - Create virtual environment:
 ```bash
-python -m venv venv
+python3.12 -m venv venv
 ```
 - Activate virtual environment:
 ```bash
@@ -85,7 +86,7 @@ SECRET_KEY=your_secret_key
 
 ### 5️⃣ Run Backend Server
 ```bash
-uvicorn main:app --reload
+uvicorn app.main:app --reload
 ```
 Backend should now be running on `http://localhost:8000`
 
