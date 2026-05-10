@@ -22,6 +22,7 @@ import {
 import { formatCurrency } from "@/lib/utils";
 import CategoryBreakdownChart from "@/components/charts/category-breakdown-chart";
 import MonthlyTrendChart from "@/components/charts/monthly-trend-chart";
+import JSZip from "jszip";
 
 const SAVED_REPORTS_KEY = "reports:saved";
 
@@ -210,9 +211,25 @@ export default function ReportsPage() {
     localStorage.setItem(SAVED_REPORTS_KEY, JSON.stringify(next));
   };
 
+  const escapeCsv = (value) => {
+    if (value === null || value === undefined) return "";
+    const str = String(value);
+    if (/[",\n]/.test(str)) {
+      return `"${str.replace(/"/g, '""')}"`;
+    }
+    return str;
+  };
+
+  const buildCsv = (rows) => {
+    return rows
+      .map((row) => row.map((value) => escapeCsv(value)).join(","))
+      .join("\n");
+  };
+
   const handleDownloadCsv = (filename, rows) => {
-    const csv = rows.map((row) => row.join(",")).join("\n");
-    const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
+    const blob = new Blob([buildCsv(rows)], {
+      type: "text/csv;charset=utf-8;",
+    });
     const link = document.createElement("a");
     link.href = URL.createObjectURL(blob);
     link.download = filename;
@@ -229,7 +246,7 @@ export default function ReportsPage() {
       ["Date", "Description", "Category", "Type", "Amount"],
       ...filteredTransactions.map((tx) => [
         tx.date ? new Date(tx.date).toISOString().slice(0, 10) : "",
-        tx.description ? `"${tx.description.replace(/"/g, '""')}"` : "",
+        tx.description || "",
         tx.category_id ? lookup[tx.category_id] || "" : "",
         tx.type,
         String(tx.amount),
@@ -242,13 +259,96 @@ export default function ReportsPage() {
     const rows = [
       ["Category", "Income", "Expense", "Net"],
       ...categoryTotals.map((row) => [
-        `"${row.name.replace(/"/g, '""')}"`,
+        row.name,
         String(row.income),
         String(row.expense),
         String(row.total),
       ]),
     ];
     handleDownloadCsv("category-summary.csv", rows);
+  };
+
+  const exportMonthlyCsv = () => {
+    const rows = [
+      ["Month", "Income", "Expense", "Net"],
+      ...monthlyTotals.map((row) => [
+        row.month,
+        String(row.income),
+        String(row.expense),
+        String(row.net),
+      ]),
+    ];
+    handleDownloadCsv("monthly-totals.csv", rows);
+  };
+
+  const exportFullReportZip = async () => {
+    const zip = new JSZip();
+
+    const summaryRows = [
+      ["Metric", "Value"],
+      ["Total Income", summaryTotals.income],
+      ["Total Expenses", summaryTotals.expense],
+      ["Net Total", summaryTotals.net],
+    ];
+
+    if (comparisonTotals) {
+      summaryRows.push(
+        ["Income vs Previous", summaryTotals.income - comparisonTotals.income],
+        [
+          "Expense vs Previous",
+          summaryTotals.expense - comparisonTotals.expense,
+        ],
+        ["Net vs Previous", summaryTotals.net - comparisonTotals.net],
+      );
+    }
+
+    const lookup = categories.reduce((acc, category) => {
+      acc[category.id] = category.name;
+      return acc;
+    }, {});
+
+    const transactionRows = [
+      ["Date", "Description", "Category", "Type", "Amount"],
+      ...filteredTransactions.map((tx) => [
+        tx.date ? new Date(tx.date).toISOString().slice(0, 10) : "",
+        tx.description || "",
+        tx.category_id ? lookup[tx.category_id] || "" : "",
+        tx.type,
+        String(tx.amount),
+      ]),
+    ];
+
+    const categoryRows = [
+      ["Category", "Income", "Expense", "Net"],
+      ...categoryTotals.map((row) => [
+        row.name,
+        String(row.income),
+        String(row.expense),
+        String(row.total),
+      ]),
+    ];
+
+    const monthlyRows = [
+      ["Month", "Income", "Expense", "Net"],
+      ...monthlyTotals.map((row) => [
+        row.month,
+        String(row.income),
+        String(row.expense),
+        String(row.net),
+      ]),
+    ];
+
+    zip.file("summary.csv", buildCsv(summaryRows));
+    zip.file("transactions.csv", buildCsv(transactionRows));
+    zip.file("category-summary.csv", buildCsv(categoryRows));
+    zip.file("monthly-totals.csv", buildCsv(monthlyRows));
+
+    const blob = await zip.generateAsync({ type: "blob" });
+    const link = document.createElement("a");
+    link.href = URL.createObjectURL(blob);
+    link.download = "full-report.zip";
+    link.click();
+    URL.revokeObjectURL(link.href);
   };
 
   return (
@@ -274,6 +374,12 @@ export default function ReportsPage() {
             </Button>
             <Button variant="outline" onClick={exportCategoryCsv}>
               Export Category Summary
+            </Button>
+            <Button variant="outline" onClick={exportMonthlyCsv}>
+              Export Monthly Totals
+            </Button>
+            <Button variant="outline" onClick={exportFullReportZip}>
+              Export Full Report (ZIP)
             </Button>
           </div>
         </div>
