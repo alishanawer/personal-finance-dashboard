@@ -1,21 +1,20 @@
+import api from "../../api/axios";
+
 const createSettingsSlice = (set, get) => ({
   settings: null,
 
   fetchSettings: async () => {
-    const res = await fetch("/api/settings");
-    const data = await res.json();
-    set({ settings: data });
+    const res = await api.get("/settings");
+    set({ settings: res.data });
+    return res.data;
   },
 
   updateSettings: async (updates) => {
+    const res = await api.put("/settings", updates);
     set((state) => ({
-      settings: { ...state.settings, ...updates },
+      settings: res.data,
     }));
-    await fetch("/api/settings", {
-      method: "PUT",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(updates),
-    });
+    return res.data;
   },
 });
 

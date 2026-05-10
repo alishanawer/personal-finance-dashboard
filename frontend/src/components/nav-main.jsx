@@ -13,7 +13,7 @@ export function NavMain({ items }) {
       <SidebarGroupLabel>Main Menu</SidebarGroupLabel>
       <SidebarMenu>
         {items.map((item) => (
-          <SidebarMenuItem>
+          <SidebarMenuItem key={item.url}>
             <SidebarMenuButton asChild tooltip={item.title}>
               <Link to={item.url}>
                 {item.icon && <item.icon />}
