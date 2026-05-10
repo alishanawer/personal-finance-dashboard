@@ -17,16 +17,32 @@ export function SignupForm({ className, ...props }) {
   const [username, setUsername] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [error, setError] = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const signup = useStore((state) => state.signup);
   const navigate = useNavigate();
 
   const handleSignup = async (e) => {
     e.preventDefault();
     try {
+      setError("");
+      setIsSubmitting(true);
       await signup({ username, email, password });
       navigate("/dashboard");
     } catch (err) {
+      const message =
+        typeof err === "string"
+          ? err
+          : Array.isArray(err?.detail)
+            ? err.detail
+                .map((item) => item?.msg)
+                .filter(Boolean)
+                .join("\n")
+            : err?.detail || "Signup failed. Please try again.";
+      setError(message);
       console.error("Signup failed:", err);
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -42,6 +58,11 @@ export function SignupForm({ className, ...props }) {
         <CardContent>
           <form onSubmit={handleSignup}>
             <div className="grid gap-6">
+              {error ? (
+                <div className="text-sm text-red-600" role="alert">
+                  {error}
+                </div>
+              ) : null}
               {/* Social logins skipped for now */}
               <div className="after:border-border relative text-center text-sm after:absolute after:inset-0 after:top-1/2 after:z-0 after:flex after:items-center after:border-t">
                 <span className="bg-card text-muted-foreground relative z-10 px-2">
@@ -56,6 +77,7 @@ export function SignupForm({ className, ...props }) {
                     type="text"
                     placeholder="Username"
                     required
+                    minLength={3}
                     value={username}
                     onChange={(e) => setUsername(e.target.value)}
                   />
@@ -78,12 +100,19 @@ export function SignupForm({ className, ...props }) {
                     type="password"
                     placeholder="Password"
                     required
+                    minLength={6}
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
                   />
+                  <p className="text-xs text-muted-foreground">
+                    Password must be at least 6 characters.
+                  </p>
                 </div>
-                <Button type="submit" className="w-full">
-                  Sign up
+                <Button
+                  type="submit"
+                  className="w-full"
+                  disabled={isSubmitting}>
+                  {isSubmitting ? "Creating account..." : "Sign up"}
                 </Button>
               </div>
               <div className="text-center text-sm">

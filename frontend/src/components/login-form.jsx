@@ -18,16 +18,32 @@ export function LoginForm({ className, ...props }) {
   const location = useLocation();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [error, setError] = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const login = useStore((state) => state.login);
   const from = location.state?.from?.pathname || "/dashboard";
 
   const handleLogin = async (e) => {
     e.preventDefault();
     try {
+      setError("");
+      setIsSubmitting(true);
       await login({ email, password });
       navigate(from, { replace: true }); // go back to where user wanted to go
     } catch (err) {
+      const message =
+        typeof err === "string"
+          ? err
+          : Array.isArray(err?.detail)
+            ? err.detail
+                .map((item) => item?.msg)
+                .filter(Boolean)
+                .join("\n")
+            : err?.detail || "Login failed. Please try again.";
+      setError(message);
       console.error("Login failed:", err);
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -43,6 +59,11 @@ export function LoginForm({ className, ...props }) {
         <CardContent>
           <form onSubmit={handleLogin}>
             <div className="grid gap-6">
+              {error ? (
+                <div className="text-sm text-red-600" role="alert">
+                  {error}
+                </div>
+              ) : null}
               {/* Social logins skipped for now */}
               <div className="after:border-border relative text-center text-sm after:absolute after:inset-0 after:top-1/2 after:z-0 after:flex after:items-center after:border-t">
                 <span className="bg-card text-muted-foreground relative z-10 px-2">
@@ -68,12 +89,19 @@ export function LoginForm({ className, ...props }) {
                     type="password"
                     placeholder="Password"
                     required
+                    minLength={6}
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
                   />
+                  <p className="text-xs text-muted-foreground">
+                    Password must be at least 6 characters.
+                  </p>
                 </div>
-                <Button type="submit" className="w-full">
-                  Login
+                <Button
+                  type="submit"
+                  className="w-full"
+                  disabled={isSubmitting}>
+                  {isSubmitting ? "Signing in..." : "Login"}
                 </Button>
               </div>
               <div className="text-center text-sm">

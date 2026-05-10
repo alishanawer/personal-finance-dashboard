@@ -1,8 +1,10 @@
 import axios from "axios";
 import useStore from "../store";
 
+const apiBaseUrl = import.meta.env.VITE_API_BASE_URL;
+
 const api = axios.create({
-  baseURL: import.meta.env.VITE_API_BASE_URL,
+  baseURL: apiBaseUrl,
   headers: {
     "Content-Type": "application/json",
   },
@@ -17,7 +19,7 @@ api.interceptors.request.use(
     }
     return config;
   },
-  (error) => Promise.reject(error)
+  (error) => Promise.reject(error),
 );
 
 // Optional: Global error handler
@@ -29,7 +31,7 @@ api.interceptors.response.use(
       useStore.getState().logout();
     }
     return Promise.reject(error);
-  }
+  },
 );
 
 export default api;
