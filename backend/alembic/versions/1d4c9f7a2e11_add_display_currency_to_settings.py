@@ -19,9 +19,11 @@ depends_on = None
 def upgrade() -> None:
     op.add_column(
         "settings",
-        sa.Column("display_currency", sa.String(), nullable=False, server_default="USD"),
+        sa.Column("display_currency", sa.String(),
+                  nullable=False, server_default="USD"),
     )
-    op.execute("UPDATE settings SET display_currency = currency WHERE display_currency IS NULL")
+    op.execute(
+        "UPDATE settings SET display_currency = currency WHERE display_currency IS NULL")
     op.alter_column("settings", "display_currency", server_default=None)
 
 

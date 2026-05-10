@@ -217,9 +217,7 @@ export default function SettingsPage() {
                 </div>
                 <div className="h-px w-full bg-border" />
                 <div className="space-y-2">
-                  <label className="text-sm font-medium">
-                    Base Currency
-                  </label>
+                  <label className="text-sm font-medium">Base Currency</label>
                   <Select
                     value={form.currency}
                     onValueChange={(val) =>
