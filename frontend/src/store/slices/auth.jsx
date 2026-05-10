@@ -9,7 +9,7 @@ function parseJwt(token) {
       atob(base64)
         .split("")
         .map((c) => "%" + ("00" + c.charCodeAt(0).toString(16)).slice(-2))
-        .join("")
+        .join(""),
     );
     return JSON.parse(jsonPayload);
   } catch {
@@ -69,7 +69,7 @@ const createAuthSlice = (set, get) => ({
         }),
         {
           headers: { "Content-Type": "application/x-www-form-urlencoded" },
-        }
+        },
       );
 
       const { access_token, user } = res.data;
@@ -135,6 +135,38 @@ const createAuthSlice = (set, get) => ({
           rehydrated: true,
         },
       });
+    }
+  },
+
+  fetchProfile: async () => {
+    try {
+      const res = await api.get("/users/me");
+      localStorage.setItem("user", JSON.stringify(res.data));
+      set((state) => ({
+        auth: {
+          ...state.auth,
+          user: res.data,
+        },
+      }));
+      return res.data;
+    } catch (error) {
+      throw error.response?.data || error.message;
+    }
+  },
+
+  updateProfile: async (updates) => {
+    try {
+      const res = await api.put("/users/me", updates);
+      localStorage.setItem("user", JSON.stringify(res.data));
+      set((state) => ({
+        auth: {
+          ...state.auth,
+          user: res.data,
+        },
+      }));
+      return res.data;
+    } catch (error) {
+      throw error.response?.data || error.message;
     }
   },
 });

@@ -2,7 +2,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from app.core.config import settings
-from app.routers import auth, category, transaction, settings as settings_router
+from app.routers import auth, category, transaction, settings as settings_router, users
 
 app = FastAPI(
     title="Personal Finance Dashboard API",
@@ -29,3 +29,4 @@ app.include_router(auth.router)
 app.include_router(category.router)
 app.include_router(transaction.router)
 app.include_router(settings_router.router)
+app.include_router(users.router)

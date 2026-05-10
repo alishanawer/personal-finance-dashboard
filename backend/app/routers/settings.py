@@ -44,6 +44,12 @@ def update_settings(
         settings.currency = updates.currency
     if updates.theme is not None:
         settings.theme = updates.theme
+    if updates.email_notifications is not None:
+        settings.email_notifications = updates.email_notifications
+    if updates.budget_alerts is not None:
+        settings.budget_alerts = updates.budget_alerts
+    if updates.weekly_summary is not None:
+        settings.weekly_summary = updates.weekly_summary
 
     db.commit()
     db.refresh(settings)
