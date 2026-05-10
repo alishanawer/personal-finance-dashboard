@@ -42,6 +42,8 @@ def update_settings(
 
     if updates.currency is not None:
         settings.currency = updates.currency
+    if updates.display_currency is not None:
+        settings.display_currency = updates.display_currency
     if updates.theme is not None:
         settings.theme = updates.theme
     if updates.email_notifications is not None:

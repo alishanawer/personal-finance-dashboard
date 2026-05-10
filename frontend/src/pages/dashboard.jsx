@@ -33,7 +33,10 @@ export default function DashboardPage() {
   const fetchTransactions = useStore((state) => state.fetchTransactions);
   const categories = useStore((state) => state.categories);
   const fetchCategories = useStore((state) => state.fetchCategories);
-  const currency = useStore((state) => state.settings?.currency || "USD");
+  const settings = useStore((state) => state.settings);
+  const fxRates = useStore((state) => state.fxRates);
+  const baseCurrency = settings?.currency || "USD";
+  const displayCurrency = settings?.display_currency || baseCurrency;
 
   const [range, setRange] = useState("90");
   const [isLoading, setIsLoading] = useState(true);
@@ -187,7 +190,10 @@ export default function DashboardPage() {
                   <CardTitle>Total Income</CardTitle>
                 </CardHeader>
                 <CardContent className="text-2xl font-semibold">
-                  {formatCurrency(totals.income, currency)}
+                  {formatCurrency(totals.income, displayCurrency, {
+                    rates: fxRates,
+                    baseCurrency,
+                  })}
                 </CardContent>
               </Card>
               <Card>
@@ -195,7 +201,10 @@ export default function DashboardPage() {
                   <CardTitle>Total Expenses</CardTitle>
                 </CardHeader>
                 <CardContent className="text-2xl font-semibold">
-                  {formatCurrency(totals.expense, currency)}
+                  {formatCurrency(totals.expense, displayCurrency, {
+                    rates: fxRates,
+                    baseCurrency,
+                  })}
                 </CardContent>
               </Card>
               <Card>
@@ -203,7 +212,10 @@ export default function DashboardPage() {
                   <CardTitle>Net Balance</CardTitle>
                 </CardHeader>
                 <CardContent className="text-2xl font-semibold">
-                  {formatCurrency(totals.net, currency)}
+                  {formatCurrency(totals.net, displayCurrency, {
+                    rates: fxRates,
+                    baseCurrency,
+                  })}
                 </CardContent>
               </Card>
               <Card>
@@ -254,7 +266,10 @@ export default function DashboardPage() {
                             {tx.type}
                           </TableCell>
                           <TableCell className="text-right">
-                            {formatCurrency(tx.amount, currency)}
+                            {formatCurrency(tx.amount, displayCurrency, {
+                              rates: fxRates,
+                              baseCurrency,
+                            })}
                           </TableCell>
                         </TableRow>
                       ))}
@@ -277,7 +292,9 @@ export default function DashboardPage() {
                   ) : (
                     <CategoryBreakdownChart
                       data={categoryTotals}
-                      currency={currency}
+                      currency={displayCurrency}
+                      fxRates={fxRates}
+                      baseCurrency={baseCurrency}
                     />
                   )}
                 </CardContent>
@@ -294,7 +311,9 @@ export default function DashboardPage() {
                   ) : (
                     <MonthlyTrendChart
                       data={monthlyTotals}
-                      currency={currency}
+                      currency={displayCurrency}
+                      fxRates={fxRates}
+                      baseCurrency={baseCurrency}
                     />
                   )}
                 </CardContent>

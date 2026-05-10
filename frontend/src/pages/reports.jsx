@@ -19,7 +19,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { formatCurrency } from "@/lib/utils";
+import { convertAmount, formatCurrency } from "@/lib/utils";
 import CategoryBreakdownChart from "@/components/charts/category-breakdown-chart";
 import MonthlyTrendChart from "@/components/charts/monthly-trend-chart";
 import JSZip from "jszip";
@@ -38,7 +38,10 @@ export default function ReportsPage() {
   const fetchTransactions = useStore((state) => state.fetchTransactions);
   const categories = useStore((state) => state.categories);
   const fetchCategories = useStore((state) => state.fetchCategories);
-  const currency = useStore((state) => state.settings?.currency || "USD");
+  const settings = useStore((state) => state.settings);
+  const fxRates = useStore((state) => state.fxRates);
+  const baseCurrency = settings?.currency || "USD";
+  const displayCurrency = settings?.display_currency || baseCurrency;
 
   const [range, setRange] = useState("90");
   const [savedReports, setSavedReports] = useState([]);
@@ -249,7 +252,13 @@ export default function ReportsPage() {
         tx.description || "",
         tx.category_id ? lookup[tx.category_id] || "" : "",
         tx.type,
-        String(tx.amount),
+        String(
+          convertAmount(tx.amount, {
+            rates: fxRates,
+            baseCurrency,
+            targetCurrency: displayCurrency,
+          }),
+        ),
       ]),
     ];
     handleDownloadCsv("transactions-report.csv", rows);
@@ -260,9 +269,27 @@ export default function ReportsPage() {
       ["Category", "Income", "Expense", "Net"],
       ...categoryTotals.map((row) => [
         row.name,
-        String(row.income),
-        String(row.expense),
-        String(row.total),
+        String(
+          convertAmount(row.income, {
+            rates: fxRates,
+            baseCurrency,
+            targetCurrency: displayCurrency,
+          }),
+        ),
+        String(
+          convertAmount(row.expense, {
+            rates: fxRates,
+            baseCurrency,
+            targetCurrency: displayCurrency,
+          }),
+        ),
+        String(
+          convertAmount(row.total, {
+            rates: fxRates,
+            baseCurrency,
+            targetCurrency: displayCurrency,
+          }),
+        ),
       ]),
     ];
     handleDownloadCsv("category-summary.csv", rows);
@@ -273,9 +300,27 @@ export default function ReportsPage() {
       ["Month", "Income", "Expense", "Net"],
       ...monthlyTotals.map((row) => [
         row.month,
-        String(row.income),
-        String(row.expense),
-        String(row.net),
+        String(
+          convertAmount(row.income, {
+            rates: fxRates,
+            baseCurrency,
+            targetCurrency: displayCurrency,
+          }),
+        ),
+        String(
+          convertAmount(row.expense, {
+            rates: fxRates,
+            baseCurrency,
+            targetCurrency: displayCurrency,
+          }),
+        ),
+        String(
+          convertAmount(row.net, {
+            rates: fxRates,
+            baseCurrency,
+            targetCurrency: displayCurrency,
+          }),
+        ),
       ]),
     ];
     handleDownloadCsv("monthly-totals.csv", rows);
@@ -286,19 +331,58 @@ export default function ReportsPage() {
 
     const summaryRows = [
       ["Metric", "Value"],
-      ["Total Income", summaryTotals.income],
-      ["Total Expenses", summaryTotals.expense],
-      ["Net Total", summaryTotals.net],
+      [
+        "Total Income",
+        convertAmount(summaryTotals.income, {
+          rates: fxRates,
+          baseCurrency,
+          targetCurrency: displayCurrency,
+        }),
+      ],
+      [
+        "Total Expenses",
+        convertAmount(summaryTotals.expense, {
+          rates: fxRates,
+          baseCurrency,
+          targetCurrency: displayCurrency,
+        }),
+      ],
+      [
+        "Net Total",
+        convertAmount(summaryTotals.net, {
+          rates: fxRates,
+          baseCurrency,
+          targetCurrency: displayCurrency,
+        }),
+      ],
     ];
 
     if (comparisonTotals) {
       summaryRows.push(
-        ["Income vs Previous", summaryTotals.income - comparisonTotals.income],
+        [
+          "Income vs Previous",
+          convertAmount(summaryTotals.income - comparisonTotals.income, {
+            rates: fxRates,
+            baseCurrency,
+            targetCurrency: displayCurrency,
+          }),
+        ],
         [
           "Expense vs Previous",
-          summaryTotals.expense - comparisonTotals.expense,
+          convertAmount(summaryTotals.expense - comparisonTotals.expense, {
+            rates: fxRates,
+            baseCurrency,
+            targetCurrency: displayCurrency,
+          }),
         ],
-        ["Net vs Previous", summaryTotals.net - comparisonTotals.net],
+        [
+          "Net vs Previous",
+          convertAmount(summaryTotals.net - comparisonTotals.net, {
+            rates: fxRates,
+            baseCurrency,
+            targetCurrency: displayCurrency,
+          }),
+        ],
       );
     }
 
@@ -314,7 +398,13 @@ export default function ReportsPage() {
         tx.description || "",
         tx.category_id ? lookup[tx.category_id] || "" : "",
         tx.type,
-        String(tx.amount),
+        String(
+          convertAmount(tx.amount, {
+            rates: fxRates,
+            baseCurrency,
+            targetCurrency: displayCurrency,
+          }),
+        ),
       ]),
     ];
 
@@ -322,9 +412,27 @@ export default function ReportsPage() {
       ["Category", "Income", "Expense", "Net"],
       ...categoryTotals.map((row) => [
         row.name,
-        String(row.income),
-        String(row.expense),
-        String(row.total),
+        String(
+          convertAmount(row.income, {
+            rates: fxRates,
+            baseCurrency,
+            targetCurrency: displayCurrency,
+          }),
+        ),
+        String(
+          convertAmount(row.expense, {
+            rates: fxRates,
+            baseCurrency,
+            targetCurrency: displayCurrency,
+          }),
+        ),
+        String(
+          convertAmount(row.total, {
+            rates: fxRates,
+            baseCurrency,
+            targetCurrency: displayCurrency,
+          }),
+        ),
       ]),
     ];
 
@@ -332,9 +440,27 @@ export default function ReportsPage() {
       ["Month", "Income", "Expense", "Net"],
       ...monthlyTotals.map((row) => [
         row.month,
-        String(row.income),
-        String(row.expense),
-        String(row.net),
+        String(
+          convertAmount(row.income, {
+            rates: fxRates,
+            baseCurrency,
+            targetCurrency: displayCurrency,
+          }),
+        ),
+        String(
+          convertAmount(row.expense, {
+            rates: fxRates,
+            baseCurrency,
+            targetCurrency: displayCurrency,
+          }),
+        ),
+        String(
+          convertAmount(row.net, {
+            rates: fxRates,
+            baseCurrency,
+            targetCurrency: displayCurrency,
+          }),
+        ),
       ]),
     ];
 
@@ -442,7 +568,10 @@ export default function ReportsPage() {
                   <CardTitle>Total Income</CardTitle>
                 </CardHeader>
                 <CardContent className="text-2xl font-semibold">
-                  {formatCurrency(summaryTotals.income, currency)}
+                  {formatCurrency(summaryTotals.income, displayCurrency, {
+                    rates: fxRates,
+                    baseCurrency,
+                  })}
                 </CardContent>
               </Card>
               <Card>
@@ -450,7 +579,10 @@ export default function ReportsPage() {
                   <CardTitle>Total Expenses</CardTitle>
                 </CardHeader>
                 <CardContent className="text-2xl font-semibold">
-                  {formatCurrency(summaryTotals.expense, currency)}
+                  {formatCurrency(summaryTotals.expense, displayCurrency, {
+                    rates: fxRates,
+                    baseCurrency,
+                  })}
                 </CardContent>
               </Card>
               <Card>
@@ -458,7 +590,10 @@ export default function ReportsPage() {
                   <CardTitle>Net Total</CardTitle>
                 </CardHeader>
                 <CardContent className="text-2xl font-semibold">
-                  {formatCurrency(summaryTotals.net, currency)}
+                  {formatCurrency(summaryTotals.net, displayCurrency, {
+                    rates: fxRates,
+                    baseCurrency,
+                  })}
                 </CardContent>
               </Card>
             </div>
@@ -471,7 +606,8 @@ export default function ReportsPage() {
                   <CardContent className="text-lg font-semibold">
                     {formatCurrency(
                       summaryTotals.income - comparisonTotals.income,
-                      currency,
+                      displayCurrency,
+                      { rates: fxRates, baseCurrency },
                     )}
                   </CardContent>
                 </Card>
@@ -482,7 +618,8 @@ export default function ReportsPage() {
                   <CardContent className="text-lg font-semibold">
                     {formatCurrency(
                       summaryTotals.expense - comparisonTotals.expense,
-                      currency,
+                      displayCurrency,
+                      { rates: fxRates, baseCurrency },
                     )}
                   </CardContent>
                 </Card>
@@ -493,7 +630,8 @@ export default function ReportsPage() {
                   <CardContent className="text-lg font-semibold">
                     {formatCurrency(
                       summaryTotals.net - comparisonTotals.net,
-                      currency,
+                      displayCurrency,
+                      { rates: fxRates, baseCurrency },
                     )}
                   </CardContent>
                 </Card>
@@ -513,7 +651,9 @@ export default function ReportsPage() {
                     <div className="space-y-6">
                       <CategoryBreakdownChart
                         data={categoryTotals}
-                        currency={currency}
+                        currency={displayCurrency}
+                        fxRates={fxRates}
+                        baseCurrency={baseCurrency}
                       />
                       <Table>
                         <TableHeader>
@@ -531,13 +671,22 @@ export default function ReportsPage() {
                             <TableRow key={row.name}>
                               <TableCell>{row.name}</TableCell>
                               <TableCell className="text-right">
-                                {formatCurrency(row.income, currency)}
+                                {formatCurrency(row.income, displayCurrency, {
+                                  rates: fxRates,
+                                  baseCurrency,
+                                })}
                               </TableCell>
                               <TableCell className="text-right">
-                                {formatCurrency(row.expense, currency)}
+                                {formatCurrency(row.expense, displayCurrency, {
+                                  rates: fxRates,
+                                  baseCurrency,
+                                })}
                               </TableCell>
                               <TableCell className="text-right">
-                                {formatCurrency(row.total, currency)}
+                                {formatCurrency(row.total, displayCurrency, {
+                                  rates: fxRates,
+                                  baseCurrency,
+                                })}
                               </TableCell>
                             </TableRow>
                           ))}
@@ -560,7 +709,9 @@ export default function ReportsPage() {
                     <div className="space-y-6">
                       <MonthlyTrendChart
                         data={monthlyTotals}
-                        currency={currency}
+                        currency={displayCurrency}
+                        fxRates={fxRates}
+                        baseCurrency={baseCurrency}
                       />
                       <Table>
                         <TableHeader>
@@ -578,13 +729,22 @@ export default function ReportsPage() {
                             <TableRow key={row.month}>
                               <TableCell>{row.month}</TableCell>
                               <TableCell className="text-right">
-                                {formatCurrency(row.income, currency)}
+                                {formatCurrency(row.income, displayCurrency, {
+                                  rates: fxRates,
+                                  baseCurrency,
+                                })}
                               </TableCell>
                               <TableCell className="text-right">
-                                {formatCurrency(row.expense, currency)}
+                                {formatCurrency(row.expense, displayCurrency, {
+                                  rates: fxRates,
+                                  baseCurrency,
+                                })}
                               </TableCell>
                               <TableCell className="text-right">
-                                {formatCurrency(row.net, currency)}
+                                {formatCurrency(row.net, displayCurrency, {
+                                  rates: fxRates,
+                                  baseCurrency,
+                                })}
                               </TableCell>
                             </TableRow>
                           ))}

@@ -90,7 +90,10 @@ export default function CategoriesPage() {
   const updateCategory = useStore((state) => state.updateCategory);
   const deleteCategory = useStore((state) => state.deleteCategory);
   const mergeCategory = useStore((state) => state.mergeCategory);
-  const currency = useStore((state) => state.settings?.currency || "USD");
+  const settings = useStore((state) => state.settings);
+  const fxRates = useStore((state) => state.fxRates);
+  const baseCurrency = settings?.currency || "USD";
+  const displayCurrency = settings?.display_currency || baseCurrency;
 
   const [open, setOpen] = useState(false);
   const [editingId, setEditingId] = useState(null);
@@ -349,7 +352,10 @@ export default function CategoriesPage() {
                           {usage ? (
                             <div className="text-sm text-muted-foreground">
                               {usage.transaction_count} tx ·{" "}
-                              {formatCurrency(net, currency)}
+                              {formatCurrency(net, displayCurrency, {
+                                rates: fxRates,
+                                baseCurrency,
+                              })}
                             </div>
                           ) : (
                             "-"

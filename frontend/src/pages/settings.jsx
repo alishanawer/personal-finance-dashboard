@@ -13,16 +13,32 @@ import {
 } from "@/components/ui/select";
 import { toast } from "sonner";
 
+const CURRENCY_OPTIONS = [
+  { code: "USD", label: "USD - US Dollar" },
+  { code: "EUR", label: "EUR - Euro" },
+  { code: "GBP", label: "GBP - British Pound" },
+  { code: "PKR", label: "PKR - Pakistani Rupee" },
+  { code: "AED", label: "AED - UAE Dirham" },
+  { code: "SAR", label: "SAR - Saudi Riyal" },
+  { code: "INR", label: "INR - Indian Rupee" },
+  { code: "CAD", label: "CAD - Canadian Dollar" },
+  { code: "AUD", label: "AUD - Australian Dollar" },
+  { code: "JPY", label: "JPY - Japanese Yen" },
+  { code: "CNY", label: "CNY - Chinese Yuan" },
+];
+
 export default function SettingsPage() {
   const settings = useStore((state) => state.settings);
   const fetchSettings = useStore((state) => state.fetchSettings);
   const updateSettings = useStore((state) => state.updateSettings);
+  const fetchFxRates = useStore((state) => state.fetchFxRates);
   const user = useStore((state) => state.auth.user);
   const fetchProfile = useStore((state) => state.fetchProfile);
   const updateProfile = useStore((state) => state.updateProfile);
 
   const [form, setForm] = useState({
     currency: "",
+    display_currency: "",
     theme: "",
     email_notifications: true,
     budget_alerts: true,
@@ -43,6 +59,7 @@ export default function SettingsPage() {
       if (!isMounted || !data) return;
       setForm({
         currency: data.currency || "USD",
+        display_currency: data.display_currency || data.currency || "USD",
         theme: data.theme || "light",
         email_notifications: data.email_notifications ?? true,
         budget_alerts: data.budget_alerts ?? true,
@@ -78,6 +95,16 @@ export default function SettingsPage() {
   }, [fetchProfile, fetchSettings, settings]);
 
   useEffect(() => {
+    if (!form.currency) return;
+    fetchFxRates(
+      form.currency,
+      CURRENCY_OPTIONS.map((item) => item.code),
+    ).catch((err) => {
+      toast.error(err?.message || "Failed to fetch exchange rates.");
+    });
+  }, [fetchFxRates, form.currency]);
+
+  useEffect(() => {
     if (!user) return;
     setProfileForm({
       username: user.username || "",
@@ -91,6 +118,7 @@ export default function SettingsPage() {
     try {
       await updateSettings({
         currency: form.currency || "USD",
+        display_currency: form.display_currency || form.currency || "USD",
         theme: form.theme || "light",
         email_notifications: form.email_notifications,
         budget_alerts: form.budget_alerts,
@@ -190,18 +218,52 @@ export default function SettingsPage() {
                 <div className="h-px w-full bg-border" />
                 <div className="space-y-2">
                   <label className="text-sm font-medium">
-                    Default Currency
+                    Base Currency
                   </label>
-                  <Input
-                    placeholder="USD"
+                  <Select
                     value={form.currency}
-                    onChange={(e) =>
+                    onValueChange={(val) =>
                       setForm({
                         ...form,
-                        currency: e.target.value.toUpperCase(),
+                        currency: val,
+                        display_currency: form.display_currency || val,
                       })
-                    }
-                  />
+                    }>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select base currency" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {CURRENCY_OPTIONS.map((option) => (
+                        <SelectItem key={option.code} value={option.code}>
+                          {option.label}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div className="space-y-2">
+                  <label className="text-sm font-medium">
+                    Display Currency
+                  </label>
+                  <Select
+                    value={form.display_currency}
+                    onValueChange={(val) =>
+                      setForm({
+                        ...form,
+                        display_currency: val,
+                      })
+                    }>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select display currency" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {CURRENCY_OPTIONS.map((option) => (
+                        <SelectItem key={option.code} value={option.code}>
+                          {option.label}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
                 </div>
                 <div className="space-y-2">
                   <label className="text-sm font-medium">Theme</label>

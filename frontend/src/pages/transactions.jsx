@@ -39,7 +39,10 @@ export default function TransactionsPage() {
   const deleteTransaction = useStore((state) => state.deleteTransaction);
   const categories = useStore((state) => state.categories);
   const fetchCategories = useStore((state) => state.fetchCategories);
-  const currency = useStore((state) => state.settings?.currency || "USD");
+  const settings = useStore((state) => state.settings);
+  const fxRates = useStore((state) => state.fxRates);
+  const baseCurrency = settings?.currency || "USD";
+  const displayCurrency = settings?.display_currency || baseCurrency;
 
   const [open, setOpen] = useState(false);
   const [editingId, setEditingId] = useState(null);
@@ -481,7 +484,10 @@ export default function TransactionsPage() {
                         </TableCell>
                         <TableCell className="capitalize">{tx.type}</TableCell>
                         <TableCell className="text-right">
-                          {formatCurrency(tx.amount, currency)}
+                          {formatCurrency(tx.amount, displayCurrency, {
+                            rates: fxRates,
+                            baseCurrency,
+                          })}
                         </TableCell>
                         <TableCell className="flex gap-2">
                           <Button

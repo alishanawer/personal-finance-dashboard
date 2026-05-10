@@ -3,6 +3,7 @@ from pydantic import BaseModel
 
 class SettingsBase(BaseModel):
     currency: str | None = None
+    display_currency: str | None = None
     theme: str | None = None
     email_notifications: bool | None = None
     budget_alerts: bool | None = None

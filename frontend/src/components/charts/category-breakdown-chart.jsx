@@ -1,6 +1,6 @@
 import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip } from "recharts";
 
-import { formatCurrency } from "@/lib/utils";
+import { convertAmount, formatCurrency } from "@/lib/utils";
 
 const COLORS = [
   "#2563eb",
@@ -12,10 +12,21 @@ const COLORS = [
   "#ea580c",
 ];
 
-export default function CategoryBreakdownChart({ data, currency }) {
+export default function CategoryBreakdownChart({
+  data,
+  currency,
+  fxRates,
+  baseCurrency,
+}) {
   const chartData = data.map((item, index) => ({
     name: item.name,
-    value: Math.abs(item.expense || 0),
+    value: Math.abs(
+      convertAmount(item.expense || 0, {
+        rates: fxRates,
+        baseCurrency,
+        targetCurrency: currency,
+      }),
+    ),
     fill: COLORS[index % COLORS.length],
   }));
 
@@ -39,7 +50,12 @@ export default function CategoryBreakdownChart({ data, currency }) {
             ))}
           </Pie>
           <Tooltip
-            formatter={(value) => formatCurrency(value, currency)}
+            formatter={(value) =>
+              formatCurrency(value, currency, {
+                rates: fxRates,
+                baseCurrency,
+              })
+            }
             contentStyle={{ borderRadius: "8px" }}
           />
         </PieChart>

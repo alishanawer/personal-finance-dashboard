@@ -8,27 +8,61 @@ import {
   Tooltip,
 } from "recharts";
 
-import { formatCurrency } from "@/lib/utils";
+import { convertAmount, formatCurrency } from "@/lib/utils";
 
-export default function MonthlyTrendChart({ data, currency }) {
+export default function MonthlyTrendChart({
+  data,
+  currency,
+  fxRates,
+  baseCurrency,
+}) {
   if (!data.length) {
     return null;
   }
+
+  const chartData = data.map((row) => ({
+    ...row,
+    income: convertAmount(row.income, {
+      rates: fxRates,
+      baseCurrency,
+      targetCurrency: currency,
+    }),
+    expense: convertAmount(row.expense, {
+      rates: fxRates,
+      baseCurrency,
+      targetCurrency: currency,
+    }),
+    net: convertAmount(row.net, {
+      rates: fxRates,
+      baseCurrency,
+      targetCurrency: currency,
+    }),
+  }));
 
   return (
     <div className="h-64">
       <ResponsiveContainer width="100%" height="100%">
         <LineChart
-          data={data}
+          data={chartData}
           margin={{ top: 8, right: 16, left: 0, bottom: 0 }}>
           <CartesianGrid strokeDasharray="3 3" />
           <XAxis dataKey="month" tick={{ fontSize: 12 }} />
           <YAxis
-            tickFormatter={(value) => formatCurrency(value, currency)}
+            tickFormatter={(value) =>
+              formatCurrency(value, currency, {
+                rates: fxRates,
+                baseCurrency,
+              })
+            }
             width={90}
           />
           <Tooltip
-            formatter={(value) => formatCurrency(value, currency)}
+            formatter={(value) =>
+              formatCurrency(value, currency, {
+                rates: fxRates,
+                baseCurrency,
+              })
+            }
             contentStyle={{ borderRadius: "8px" }}
           />
           <Line

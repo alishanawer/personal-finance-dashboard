@@ -9,6 +9,7 @@ class Settings(Base):
 
     id = Column(Integer, primary_key=True, index=True)
     currency = Column(String, default="USD")
+    display_currency = Column(String, default="USD")
     theme = Column(String, default="light")  # light/dark mode
     email_notifications = Column(Boolean, default=True)
     budget_alerts = Column(Boolean, default=True)
