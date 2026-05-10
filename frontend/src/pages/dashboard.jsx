@@ -11,6 +11,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import CategoryBreakdownChart from "@/components/charts/category-breakdown-chart";
 
 export default function DashboardPage() {
   const transactions = useStore((state) => state.transactions);
@@ -76,6 +77,29 @@ export default function DashboardPage() {
       })
       .slice(0, 5);
   }, [transactions]);
+
+  const categoryTotals = useMemo(() => {
+    const totals = transactions.reduce((acc, tx) => {
+      const key = tx.category_id
+        ? categoryLookup[tx.category_id] || "Uncategorized"
+        : "Uncategorized";
+      if (!acc[key]) {
+        acc[key] = { income: 0, expense: 0, total: 0 };
+      }
+      if (tx.type === "income") {
+        acc[key].income += tx.amount;
+      } else {
+        acc[key].expense += tx.amount;
+      }
+      acc[key].total = acc[key].income - acc[key].expense;
+      return acc;
+    }, {});
+
+    return Object.entries(totals).map(([name, values]) => ({
+      name,
+      ...values,
+    }));
+  }, [transactions, categoryLookup]);
 
   return (
     <Layout>
@@ -163,6 +187,24 @@ export default function DashboardPage() {
                       ))}
                     </TableBody>
                   </Table>
+                )}
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardHeader>
+                <CardTitle>Spending by Category</CardTitle>
+              </CardHeader>
+              <CardContent>
+                {categoryTotals.length === 0 ? (
+                  <div className="text-center text-muted-foreground py-6">
+                    No category data yet.
+                  </div>
+                ) : (
+                  <CategoryBreakdownChart
+                    data={categoryTotals}
+                    currency={currency}
+                  />
                 )}
               </CardContent>
             </Card>

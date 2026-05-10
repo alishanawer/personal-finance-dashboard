@@ -11,6 +11,7 @@ import CategoriesPage from "./pages/categories/categories";
 import ProtectedRoute from "./components/protected-routes";
 import { ThemeProvider } from "./components/theme-provider";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { Toaster } from "sonner";
 
 function App() {
   const rehydrateAuth = useStore((state) => state.rehydrateAuth);
@@ -21,6 +22,7 @@ function App() {
 
   return (
     <ThemeProvider defaultTheme="system" storageKey="vite-ui-theme">
+      <Toaster richColors position="top-right" />
       <BrowserRouter>
         <Routes>
           {/* Public routes */}

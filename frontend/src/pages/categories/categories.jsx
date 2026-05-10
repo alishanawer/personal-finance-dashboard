@@ -27,6 +27,7 @@ import {
 import { Plus, Edit, Trash } from "lucide-react";
 import Layout from "@/components/layout";
 import useStore from "@/store";
+import { toast } from "sonner";
 
 export default function CategoriesPage() {
   const categories = useStore((state) => state.categories);
@@ -83,13 +84,16 @@ export default function CategoriesPage() {
     try {
       if (editingId) {
         await updateCategory(editingId, form);
+        toast.success("Category updated.");
       } else {
         await addCategory(form);
+        toast.success("Category created.");
       }
       setOpen(false);
       resetForm();
     } catch (err) {
       setError(err?.detail || err?.message || "Failed to save category.");
+      toast.error(err?.detail || err?.message || "Failed to save category.");
     }
   };
 
@@ -97,8 +101,10 @@ export default function CategoriesPage() {
     setError(null);
     try {
       await deleteCategory(id);
+      toast.success("Category deleted.");
     } catch (err) {
       setError(err?.detail || err?.message || "Failed to delete category.");
+      toast.error(err?.detail || err?.message || "Failed to delete category.");
     }
   };
 

@@ -5,6 +5,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import { toast } from "sonner";
 import useStore from "@/store";
 import { cn } from "@/lib/utils";
 import { useState } from "react";
@@ -29,6 +30,7 @@ export function LoginForm({ className, ...props }) {
       setError("");
       setIsSubmitting(true);
       await login({ email, password });
+      toast.success("Welcome back!");
       navigate(from, { replace: true }); // go back to where user wanted to go
     } catch (err) {
       const message =
@@ -42,6 +44,7 @@ export function LoginForm({ className, ...props }) {
             : err?.detail || "Login failed. Please try again.";
       setError(message);
       console.error("Login failed:", err);
+      toast.error(err?.detail || err?.message || "Login failed.");
     } finally {
       setIsSubmitting(false);
     }

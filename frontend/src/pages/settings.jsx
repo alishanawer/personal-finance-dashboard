@@ -11,6 +11,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { toast } from "sonner";
 
 export default function SettingsPage() {
   const settings = useStore((state) => state.settings);
@@ -67,8 +68,10 @@ export default function SettingsPage() {
         currency: form.currency || "USD",
         theme: form.theme || "light",
       });
+      toast.success("Settings updated.");
     } catch (err) {
       setError(err?.detail || err?.message || "Failed to update settings.");
+      toast.error(err?.detail || err?.message || "Failed to update settings.");
     } finally {
       setIsSaving(false);
     }

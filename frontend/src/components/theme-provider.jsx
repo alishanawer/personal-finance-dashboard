@@ -1,4 +1,5 @@
 import { createContext, useContext, useEffect, useState } from "react";
+import useStore from "@/store";
 
 const initialState = {
   theme: "system",
@@ -14,8 +15,15 @@ export function ThemeProvider({
   ...props
 }) {
   const [theme, setTheme] = useState(
-    () => localStorage.getItem(storageKey) || defaultTheme
+    () => localStorage.getItem(storageKey) || defaultTheme,
   );
+  const settingsTheme = useStore((state) => state.settings?.theme);
+
+  useEffect(() => {
+    if (!settingsTheme || settingsTheme === theme) return;
+    localStorage.setItem(storageKey, settingsTheme);
+    setTheme(settingsTheme);
+  }, [settingsTheme, storageKey, theme]);
 
   useEffect(() => {
     const root = window.document.documentElement;

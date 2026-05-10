@@ -12,6 +12,7 @@ import { Label } from "@/components/ui/label";
 import { useState } from "react";
 import useStore from "@/store";
 import { useNavigate } from "react-router-dom";
+import { toast } from "sonner";
 
 export function SignupForm({ className, ...props }) {
   const [username, setUsername] = useState("");
@@ -28,6 +29,7 @@ export function SignupForm({ className, ...props }) {
       setError("");
       setIsSubmitting(true);
       await signup({ username, email, password });
+      toast.success("Account created successfully.");
       navigate("/dashboard");
     } catch (err) {
       const message =
@@ -41,6 +43,7 @@ export function SignupForm({ className, ...props }) {
             : err?.detail || "Signup failed. Please try again.";
       setError(message);
       console.error("Signup failed:", err);
+      toast.error(err?.detail || err?.message || "Signup failed.");
     } finally {
       setIsSubmitting(false);
     }

@@ -18,6 +18,8 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { formatCurrency } from "@/lib/utils";
+import CategoryBreakdownChart from "@/components/charts/category-breakdown-chart";
+import MonthlyTrendChart from "@/components/charts/monthly-trend-chart";
 
 const ranges = [
   { label: "Last 30 days", value: "30" },
@@ -162,32 +164,38 @@ export default function ReportsPage() {
                     No data for this range.
                   </div>
                 ) : (
-                  <Table>
-                    <TableHeader>
-                      <TableRow>
-                        <TableHead>Category</TableHead>
-                        <TableHead className="text-right">Income</TableHead>
-                        <TableHead className="text-right">Expense</TableHead>
-                        <TableHead className="text-right">Net</TableHead>
-                      </TableRow>
-                    </TableHeader>
-                    <TableBody>
-                      {categoryTotals.map((row) => (
-                        <TableRow key={row.name}>
-                          <TableCell>{row.name}</TableCell>
-                          <TableCell className="text-right">
-                            {formatCurrency(row.income, currency)}
-                          </TableCell>
-                          <TableCell className="text-right">
-                            {formatCurrency(row.expense, currency)}
-                          </TableCell>
-                          <TableCell className="text-right">
-                            {formatCurrency(row.total, currency)}
-                          </TableCell>
+                  <div className="space-y-6">
+                    <CategoryBreakdownChart
+                      data={categoryTotals}
+                      currency={currency}
+                    />
+                    <Table>
+                      <TableHeader>
+                        <TableRow>
+                          <TableHead>Category</TableHead>
+                          <TableHead className="text-right">Income</TableHead>
+                          <TableHead className="text-right">Expense</TableHead>
+                          <TableHead className="text-right">Net</TableHead>
                         </TableRow>
-                      ))}
-                    </TableBody>
-                  </Table>
+                      </TableHeader>
+                      <TableBody>
+                        {categoryTotals.map((row) => (
+                          <TableRow key={row.name}>
+                            <TableCell>{row.name}</TableCell>
+                            <TableCell className="text-right">
+                              {formatCurrency(row.income, currency)}
+                            </TableCell>
+                            <TableCell className="text-right">
+                              {formatCurrency(row.expense, currency)}
+                            </TableCell>
+                            <TableCell className="text-right">
+                              {formatCurrency(row.total, currency)}
+                            </TableCell>
+                          </TableRow>
+                        ))}
+                      </TableBody>
+                    </Table>
+                  </div>
                 )}
               </CardContent>
             </Card>
@@ -201,32 +209,38 @@ export default function ReportsPage() {
                     No data for this range.
                   </div>
                 ) : (
-                  <Table>
-                    <TableHeader>
-                      <TableRow>
-                        <TableHead>Month</TableHead>
-                        <TableHead className="text-right">Income</TableHead>
-                        <TableHead className="text-right">Expense</TableHead>
-                        <TableHead className="text-right">Net</TableHead>
-                      </TableRow>
-                    </TableHeader>
-                    <TableBody>
-                      {monthlyTotals.map((row) => (
-                        <TableRow key={row.month}>
-                          <TableCell>{row.month}</TableCell>
-                          <TableCell className="text-right">
-                            {formatCurrency(row.income, currency)}
-                          </TableCell>
-                          <TableCell className="text-right">
-                            {formatCurrency(row.expense, currency)}
-                          </TableCell>
-                          <TableCell className="text-right">
-                            {formatCurrency(row.net, currency)}
-                          </TableCell>
+                  <div className="space-y-6">
+                    <MonthlyTrendChart
+                      data={monthlyTotals}
+                      currency={currency}
+                    />
+                    <Table>
+                      <TableHeader>
+                        <TableRow>
+                          <TableHead>Month</TableHead>
+                          <TableHead className="text-right">Income</TableHead>
+                          <TableHead className="text-right">Expense</TableHead>
+                          <TableHead className="text-right">Net</TableHead>
                         </TableRow>
-                      ))}
-                    </TableBody>
-                  </Table>
+                      </TableHeader>
+                      <TableBody>
+                        {monthlyTotals.map((row) => (
+                          <TableRow key={row.month}>
+                            <TableCell>{row.month}</TableCell>
+                            <TableCell className="text-right">
+                              {formatCurrency(row.income, currency)}
+                            </TableCell>
+                            <TableCell className="text-right">
+                              {formatCurrency(row.expense, currency)}
+                            </TableCell>
+                            <TableCell className="text-right">
+                              {formatCurrency(row.net, currency)}
+                            </TableCell>
+                          </TableRow>
+                        ))}
+                      </TableBody>
+                    </Table>
+                  </div>
                 )}
               </CardContent>
             </Card>

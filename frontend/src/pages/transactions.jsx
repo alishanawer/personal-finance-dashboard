@@ -28,6 +28,7 @@ import {
 } from "@/components/ui/table";
 import { Plus, Edit, Trash } from "lucide-react";
 import { formatCurrency } from "@/lib/utils";
+import { toast } from "sonner";
 
 export default function TransactionsPage() {
   const transactions = useStore((state) => state.transactions);
@@ -122,13 +123,16 @@ export default function TransactionsPage() {
     try {
       if (editingId) {
         await updateTransaction(editingId, payload);
+        toast.success("Transaction updated.");
       } else {
         await addTransaction(payload);
+        toast.success("Transaction added.");
       }
       setOpen(false);
       resetForm();
     } catch (err) {
       setError(err?.detail || err?.message || "Failed to save transaction.");
+      toast.error(err?.detail || err?.message || "Failed to save transaction.");
     }
   };
 
@@ -136,8 +140,12 @@ export default function TransactionsPage() {
     setError(null);
     try {
       await deleteTransaction(transactionId);
+      toast.success("Transaction deleted.");
     } catch (err) {
       setError(err?.detail || err?.message || "Failed to delete transaction.");
+      toast.error(
+        err?.detail || err?.message || "Failed to delete transaction.",
+      );
     }
   };
 

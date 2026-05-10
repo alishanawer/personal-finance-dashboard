@@ -4,12 +4,12 @@ const createTransactionsSlice = (set, get) => ({
   transactions: [],
 
   fetchTransactions: async () => {
-    const res = await api.get("/transactions");
+    const res = await api.get("/transactions/");
     set({ transactions: res.data });
   },
 
   addTransaction: async (tx) => {
-    const res = await api.post("/transactions", tx);
+    const res = await api.post("/transactions/", tx);
     set((state) => ({
       transactions: [...state.transactions, res.data],
     }));

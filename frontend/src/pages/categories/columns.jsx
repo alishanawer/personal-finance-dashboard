@@ -4,20 +4,17 @@
 import { Button } from "@/components/ui/button";
 import { ArrowUpDown } from "lucide-react";
 
-// Define your columns for categories
-export const columns = [
+export const createCategoryColumns = ({ onEdit, onDelete }) => [
   {
     accessorKey: "name",
-    header: ({ column }) => {
-      return (
-        <Button
-          variant="ghost"
-          onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}>
-          Name
-          <ArrowUpDown className="ml-2 h-4 w-4" />
-        </Button>
-      );
-    },
+    header: ({ column }) => (
+      <Button
+        variant="ghost"
+        onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}>
+        Name
+        <ArrowUpDown className="ml-2 h-4 w-4" />
+      </Button>
+    ),
   },
   {
     accessorKey: "type",
@@ -41,16 +38,13 @@ export const columns = [
       const category = row.original;
       return (
         <div className="flex gap-2">
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => console.log("Edit", category)}>
+          <Button variant="outline" size="sm" onClick={() => onEdit(category)}>
             Edit
           </Button>
           <Button
             variant="destructive"
             size="sm"
-            onClick={() => console.log("Delete", category)}>
+            onClick={() => onDelete(category)}>
             Delete
           </Button>
         </div>

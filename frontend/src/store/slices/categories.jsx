@@ -4,12 +4,12 @@ const createCategoriesSlice = (set, get) => ({
   categories: [],
 
   fetchCategories: async () => {
-    const res = await api.get("/categories");
+    const res = await api.get("/categories/");
     set({ categories: res.data });
   },
 
   addCategory: async (category) => {
-    const res = await api.post("/categories", category);
+    const res = await api.post("/categories/", category);
     set((state) => ({
       categories: [...state.categories, res.data],
     }));
