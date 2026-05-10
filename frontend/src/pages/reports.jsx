@@ -17,6 +17,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { formatCurrency } from "@/lib/utils";
 
 const ranges = [
   { label: "Last 30 days", value: "30" },
@@ -30,6 +31,7 @@ export default function ReportsPage() {
   const fetchTransactions = useStore((state) => state.fetchTransactions);
   const categories = useStore((state) => state.categories);
   const fetchCategories = useStore((state) => state.fetchCategories);
+  const currency = useStore((state) => state.settings?.currency || "USD");
 
   const [range, setRange] = useState("90");
   const [isLoading, setIsLoading] = useState(true);
@@ -174,13 +176,13 @@ export default function ReportsPage() {
                         <TableRow key={row.name}>
                           <TableCell>{row.name}</TableCell>
                           <TableCell className="text-right">
-                            {row.income.toFixed(2)}
+                            {formatCurrency(row.income, currency)}
                           </TableCell>
                           <TableCell className="text-right">
-                            {row.expense.toFixed(2)}
+                            {formatCurrency(row.expense, currency)}
                           </TableCell>
                           <TableCell className="text-right">
-                            {row.total.toFixed(2)}
+                            {formatCurrency(row.total, currency)}
                           </TableCell>
                         </TableRow>
                       ))}
@@ -213,13 +215,13 @@ export default function ReportsPage() {
                         <TableRow key={row.month}>
                           <TableCell>{row.month}</TableCell>
                           <TableCell className="text-right">
-                            {row.income.toFixed(2)}
+                            {formatCurrency(row.income, currency)}
                           </TableCell>
                           <TableCell className="text-right">
-                            {row.expense.toFixed(2)}
+                            {formatCurrency(row.expense, currency)}
                           </TableCell>
                           <TableCell className="text-right">
-                            {row.net.toFixed(2)}
+                            {formatCurrency(row.net, currency)}
                           </TableCell>
                         </TableRow>
                       ))}

@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from "react";
 import Layout from "@/components/layout";
 import useStore from "@/store";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { formatCurrency } from "@/lib/utils";
 import {
   Table,
   TableBody,
@@ -16,6 +17,7 @@ export default function DashboardPage() {
   const fetchTransactions = useStore((state) => state.fetchTransactions);
   const categories = useStore((state) => state.categories);
   const fetchCategories = useStore((state) => state.fetchCategories);
+  const currency = useStore((state) => state.settings?.currency || "USD");
 
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -96,7 +98,7 @@ export default function DashboardPage() {
                   <CardTitle>Total Income</CardTitle>
                 </CardHeader>
                 <CardContent className="text-2xl font-semibold">
-                  {totals.income.toFixed(2)}
+                  {formatCurrency(totals.income, currency)}
                 </CardContent>
               </Card>
               <Card>
@@ -104,7 +106,7 @@ export default function DashboardPage() {
                   <CardTitle>Total Expenses</CardTitle>
                 </CardHeader>
                 <CardContent className="text-2xl font-semibold">
-                  {totals.expense.toFixed(2)}
+                  {formatCurrency(totals.expense, currency)}
                 </CardContent>
               </Card>
               <Card>
@@ -112,7 +114,7 @@ export default function DashboardPage() {
                   <CardTitle>Net Balance</CardTitle>
                 </CardHeader>
                 <CardContent className="text-2xl font-semibold">
-                  {totals.net.toFixed(2)}
+                  {formatCurrency(totals.net, currency)}
                 </CardContent>
               </Card>
             </div>
@@ -155,7 +157,7 @@ export default function DashboardPage() {
                             {tx.type}
                           </TableCell>
                           <TableCell className="text-right">
-                            {tx.amount.toFixed(2)}
+                            {formatCurrency(tx.amount, currency)}
                           </TableCell>
                         </TableRow>
                       ))}

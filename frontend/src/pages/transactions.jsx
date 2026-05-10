@@ -27,6 +27,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Plus, Edit, Trash } from "lucide-react";
+import { formatCurrency } from "@/lib/utils";
 
 export default function TransactionsPage() {
   const transactions = useStore((state) => state.transactions);
@@ -36,6 +37,7 @@ export default function TransactionsPage() {
   const deleteTransaction = useStore((state) => state.deleteTransaction);
   const categories = useStore((state) => state.categories);
   const fetchCategories = useStore((state) => state.fetchCategories);
+  const currency = useStore((state) => state.settings?.currency || "USD");
 
   const [open, setOpen] = useState(false);
   const [editingId, setEditingId] = useState(null);
@@ -260,7 +262,7 @@ export default function TransactionsPage() {
                       </TableCell>
                       <TableCell className="capitalize">{tx.type}</TableCell>
                       <TableCell className="text-right">
-                        {tx.amount.toFixed(2)}
+                        {formatCurrency(tx.amount, currency)}
                       </TableCell>
                       <TableCell className="flex gap-2">
                         <Button
