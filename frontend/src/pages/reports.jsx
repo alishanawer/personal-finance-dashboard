@@ -246,7 +246,13 @@ export default function ReportsPage() {
       return acc;
     }, {});
     const rows = [
-      ["Date", "Description", "Category", "Type", "Amount"],
+      [
+        "Date",
+        "Description",
+        "Category",
+        "Type",
+        `Amount (${displayCurrency})`,
+      ],
       ...filteredTransactions.map((tx) => [
         tx.date ? new Date(tx.date).toISOString().slice(0, 10) : "",
         tx.description || "",
@@ -266,7 +272,12 @@ export default function ReportsPage() {
 
   const exportCategoryCsv = () => {
     const rows = [
-      ["Category", "Income", "Expense", "Net"],
+      [
+        "Category",
+        `Income (${displayCurrency})`,
+        `Expense (${displayCurrency})`,
+        `Net (${displayCurrency})`,
+      ],
       ...categoryTotals.map((row) => [
         row.name,
         String(
@@ -297,7 +308,12 @@ export default function ReportsPage() {
 
   const exportMonthlyCsv = () => {
     const rows = [
-      ["Month", "Income", "Expense", "Net"],
+      [
+        "Month",
+        `Income (${displayCurrency})`,
+        `Expense (${displayCurrency})`,
+        `Net (${displayCurrency})`,
+      ],
       ...monthlyTotals.map((row) => [
         row.month,
         String(
@@ -330,7 +346,7 @@ export default function ReportsPage() {
     const zip = new JSZip();
 
     const summaryRows = [
-      ["Metric", "Value"],
+      ["Metric", `Value (${displayCurrency})`],
       [
         "Total Income",
         convertAmount(summaryTotals.income, {
@@ -392,7 +408,13 @@ export default function ReportsPage() {
     }, {});
 
     const transactionRows = [
-      ["Date", "Description", "Category", "Type", "Amount"],
+      [
+        "Date",
+        "Description",
+        "Category",
+        "Type",
+        `Amount (${displayCurrency})`,
+      ],
       ...filteredTransactions.map((tx) => [
         tx.date ? new Date(tx.date).toISOString().slice(0, 10) : "",
         tx.description || "",
@@ -409,7 +431,12 @@ export default function ReportsPage() {
     ];
 
     const categoryRows = [
-      ["Category", "Income", "Expense", "Net"],
+      [
+        "Category",
+        `Income (${displayCurrency})`,
+        `Expense (${displayCurrency})`,
+        `Net (${displayCurrency})`,
+      ],
       ...categoryTotals.map((row) => [
         row.name,
         String(
@@ -437,7 +464,12 @@ export default function ReportsPage() {
     ];
 
     const monthlyRows = [
-      ["Month", "Income", "Expense", "Net"],
+      [
+        "Month",
+        `Income (${displayCurrency})`,
+        `Expense (${displayCurrency})`,
+        `Net (${displayCurrency})`,
+      ],
       ...monthlyTotals.map((row) => [
         row.month,
         String(
