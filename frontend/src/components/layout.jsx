@@ -8,7 +8,7 @@ export default function Layout({ children }) {
       <AppSidebar />
       <SidebarInset>
         <SiteHeader />
-        <div className="flex flex-1 flex-col gap-4 p-4 pt-0">{children}</div>
+        <div className="flex flex-1 flex-col gap-4 p-6 md:p-8 pt-0 bg-background/50">{children}</div>
       </SidebarInset>
     </SidebarProvider>
   );

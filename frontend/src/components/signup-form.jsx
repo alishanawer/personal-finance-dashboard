@@ -62,7 +62,7 @@ export function SignupForm({ className, ...props }) {
           <form onSubmit={handleSignup}>
             <div className="grid gap-6">
               {error ? (
-                <div className="text-sm text-red-600" role="alert">
+                <div className="text-sm text-destructive" role="alert">
                   {error}
                 </div>
               ) : null}

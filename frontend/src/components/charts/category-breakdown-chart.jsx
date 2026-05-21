@@ -1,15 +1,17 @@
 import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip } from "recharts";
 
 import { convertAmount, formatCurrency } from "@/lib/utils";
+import { fallbackColors, getChartColor } from "@/utils/chart-colors";
 
+// Use fallback colors that respect the design system
 const COLORS = [
-  "#2563eb",
-  "#16a34a",
-  "#dc2626",
-  "#f97316",
-  "#7c3aed",
-  "#0ea5e9",
-  "#ea580c",
+  fallbackColors.alt1,    // Blue
+  fallbackColors.income,  // Green
+  fallbackColors.expense, // Red
+  fallbackColors.alt2,    // Orange
+  fallbackColors.alt3,    // Purple
+  fallbackColors.alt4,    // Cyan
+  fallbackColors.alt5,    // Dark Orange
 ];
 
 export default function CategoryBreakdownChart({
@@ -35,7 +37,7 @@ export default function CategoryBreakdownChart({
   }
 
   return (
-    <div className="h-64">
+    <div className="h-48 md:h-64 lg:h-80">
       <ResponsiveContainer width="100%" height="100%">
         <PieChart>
           <Pie

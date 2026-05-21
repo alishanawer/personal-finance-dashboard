@@ -9,6 +9,7 @@ import {
 } from "recharts";
 
 import { convertAmount, formatCurrency } from "@/lib/utils";
+import { fallbackColors } from "@/utils/chart-colors";
 
 export default function MonthlyTrendChart({
   data,
@@ -40,7 +41,7 @@ export default function MonthlyTrendChart({
   }));
 
   return (
-    <div className="h-64">
+    <div className="h-48 md:h-64 lg:h-80">
       <ResponsiveContainer width="100%" height="100%">
         <LineChart
           data={chartData}
@@ -68,14 +69,14 @@ export default function MonthlyTrendChart({
           <Line
             type="monotone"
             dataKey="income"
-            stroke="#16a34a"
+            stroke={fallbackColors.income}
             strokeWidth={2}
             dot={false}
           />
           <Line
             type="monotone"
             dataKey="expense"
-            stroke="#dc2626"
+            stroke={fallbackColors.expense}
             strokeWidth={2}
             dot={false}
           />

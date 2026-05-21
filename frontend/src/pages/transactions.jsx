@@ -26,9 +26,12 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { Plus, Edit, Trash } from "lucide-react";
+import { Plus, Edit, Trash2, Search } from "lucide-react";
 import { formatCurrency } from "@/lib/utils";
 import { toast } from "sonner";
+import { PageHeader } from "@/components/page-header";
+import { LoadingState } from "@/components/loading-state";
+import { EmptyState } from "@/components/empty-state";
 
 export default function TransactionsPage() {
   const transactions = useStore((state) => state.transactions);
@@ -257,23 +260,24 @@ export default function TransactionsPage() {
 
   return (
     <Layout>
-      <div className="p-6">
-        <Card className="shadow-md rounded-2xl">
-          <CardHeader className="flex flex-row items-center justify-between">
-            <CardTitle>Transactions</CardTitle>
+      <div className="space-y-6">
+        <PageHeader
+          title="Transactions"
+          subtitle="Track all your income and expenses"
+          actions={
             <Dialog open={open} onOpenChange={setOpen}>
               <Button
-                className="flex items-center gap-2"
+                className="gap-2"
                 onClick={handleOpenCreate}>
-                <Plus size={16} /> Add Transaction
+                <Plus size={18} /> Add Transaction
               </Button>
-              <DialogContent>
+              <DialogContent className="max-w-md">
                 <DialogHeader>
                   <DialogTitle>
                     {editingId ? "Edit Transaction" : "Add Transaction"}
                   </DialogTitle>
                 </DialogHeader>
-                <div className="space-y-4">
+                <div className="space-y-4 py-4">
                   <Input
                     type="number"
                     min="0"
@@ -328,23 +332,44 @@ export default function TransactionsPage() {
                 </div>
                 <DialogFooter>
                   <Button
+                    variant="outline"
+                    onClick={() => setOpen(false)}>
+                    Cancel
+                  </Button>
+                  <Button
                     onClick={handleSave}
                     disabled={!form.amount || Number(form.amount) <= 0}>
-                    Save
+                    {editingId ? "Update" : "Create"}
                   </Button>
                 </DialogFooter>
               </DialogContent>
             </Dialog>
+          }
+        />
+
+        {error ? (
+          <div className="rounded-lg border border-destructive/40 bg-destructive/10 px-4 py-3 text-sm text-destructive">
+            {error}
+          </div>
+        ) : null}
+
+        <Card>
+          <CardHeader className="pb-4">
+            <CardTitle className="text-base">Filter Transactions</CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="mb-6 grid gap-3 lg:grid-cols-6">
-              <Input
-                placeholder="Search description"
-                value={filters.q}
-                onChange={(e) =>
-                  setFilters((prev) => ({ ...prev, q: e.target.value }))
-                }
-              />
+            <div className="grid gap-3 grid-cols-1 sm:grid-cols-2 lg:grid-cols-4">
+              <div className="flex items-center gap-2">
+                <Search size={16} className="text-muted-foreground" />
+                <Input
+                  placeholder="Search description"
+                  value={filters.q}
+                  onChange={(e) =>
+                    setFilters((prev) => ({ ...prev, q: e.target.value }))
+                  }
+                  className="flex-1"
+                />
+              </div>
               <Select
                 value={filters.txType}
                 onValueChange={(val) =>
@@ -383,6 +408,8 @@ export default function TransactionsPage() {
                   setFilters((prev) => ({ ...prev, startDate: e.target.value }))
                 }
               />
+            </div>
+            <div className="grid gap-3 grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 mt-3">
               <Input
                 type="date"
                 value={filters.endDate}
@@ -390,12 +417,12 @@ export default function TransactionsPage() {
                   setFilters((prev) => ({ ...prev, endDate: e.target.value }))
                 }
               />
-              <div className="flex flex-wrap gap-2">
+              <div className="flex gap-2">
                 <Input
                   type="number"
                   min="0"
                   step="0.01"
-                  placeholder="Min"
+                  placeholder="Min amount"
                   value={filters.minAmount}
                   onChange={(e) =>
                     setFilters((prev) => ({
@@ -408,7 +435,7 @@ export default function TransactionsPage() {
                   type="number"
                   min="0"
                   step="0.01"
-                  placeholder="Max"
+                  placeholder="Max amount"
                   value={filters.maxAmount}
                   onChange={(e) =>
                     setFilters((prev) => ({
@@ -418,96 +445,126 @@ export default function TransactionsPage() {
                   }
                 />
               </div>
-              <div className="flex flex-wrap items-center gap-2 lg:col-span-2">
-                <Select
-                  value={String(pageSize)}
-                  onValueChange={(val) => {
-                    setPageSize(Number(val));
-                    setPage(1);
-                  }}>
-                  <SelectTrigger className="w-[140px]">
-                    <SelectValue placeholder="Rows" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="10">10 rows</SelectItem>
-                    <SelectItem value="20">20 rows</SelectItem>
-                    <SelectItem value="50">50 rows</SelectItem>
-                  </SelectContent>
-                </Select>
-                <Button variant="secondary" onClick={handleApplyFilters}>
+              <Select
+                value={String(pageSize)}
+                onValueChange={(val) => {
+                  setPageSize(Number(val));
+                  setPage(1);
+                }}>
+                <SelectTrigger>
+                  <SelectValue placeholder="Rows per page" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="10">10 rows</SelectItem>
+                  <SelectItem value="20">20 rows</SelectItem>
+                  <SelectItem value="50">50 rows</SelectItem>
+                </SelectContent>
+              </Select>
+              <div className="flex gap-2">
+                <Button
+                  variant="default"
+                  onClick={handleApplyFilters}
+                  className="flex-1">
                   Apply
                 </Button>
-                <Button variant="ghost" onClick={handleResetFilters}>
+                <Button
+                  variant="outline"
+                  onClick={handleResetFilters}
+                  className="flex-1">
                   Reset
                 </Button>
               </div>
             </div>
-            {error ? (
-              <div className="rounded-md border border-destructive/40 bg-destructive/10 px-3 py-2 text-sm text-destructive">
-                {error}
-              </div>
-            ) : null}
-            {isLoading ? (
-              <div className="text-center text-muted-foreground py-10">
-                Loading transactions...
-              </div>
-            ) : transactions.length === 0 ? (
-              <div className="text-center text-muted-foreground py-10">
-                No transactions yet. Add your first one!
-              </div>
-            ) : (
-              <div className="space-y-4">
+          </CardContent>
+        </Card>
+
+        {isLoading ? (
+          <LoadingState message="Loading transactions..." />
+        ) : transactions.length === 0 ? (
+          <EmptyState
+            icon={Search}
+            title="No transactions yet"
+            description="Start tracking your finances by adding your first transaction."
+            actionLabel="Add Transaction"
+            action={handleOpenCreate}
+          />
+        ) : (
+          <Card>
+            <CardContent className="pt-6">
+              <div className="overflow-x-auto">
                 <Table>
                   <TableHeader>
-                    <TableRow>
-                      <TableHead>Date</TableHead>
+                    <TableRow className="hover:bg-transparent">
+                      <TableHead className="w-24">Date</TableHead>
                       <TableHead>Description</TableHead>
-                      <TableHead>Category</TableHead>
-                      <TableHead>Type</TableHead>
-                      <TableHead className="text-right">Amount</TableHead>
-                      <TableHead className="w-24">Actions</TableHead>
+                      <TableHead className="w-32">Category</TableHead>
+                      <TableHead className="w-24">Type</TableHead>
+                      <TableHead className="text-right w-32">Amount</TableHead>
+                      <TableHead className="w-24 text-right">Actions</TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
                     {transactions.map((tx) => (
-                      <TableRow key={tx.id}>
-                        <TableCell>
+                      <TableRow key={tx.id} className="hover:bg-accent/30">
+                        <TableCell className="font-medium text-sm">
                           {tx.date
                             ? new Date(tx.date).toLocaleDateString()
                             : "-"}
                         </TableCell>
-                        <TableCell>{tx.description || "-"}</TableCell>
-                        <TableCell>
+                        <TableCell className="text-sm">{tx.description || "-"}</TableCell>
+                        <TableCell className="text-sm">
                           {tx.category_id
                             ? categoryLookup[tx.category_id] || "-"
                             : "-"}
                         </TableCell>
-                        <TableCell className="capitalize">{tx.type}</TableCell>
-                        <TableCell className="text-right">
-                          {formatCurrency(tx.amount, displayCurrency, {
-                            rates: fxRates,
-                            baseCurrency,
-                          })}
+                        <TableCell className="capitalize text-sm">
+                          <span
+                            className={`inline-block px-2 py-1 rounded text-xs font-medium ${
+                              tx.type === "income"
+                                ? "bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300"
+                                : "bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-300"
+                            }`}>
+                            {tx.type}
+                          </span>
                         </TableCell>
-                        <TableCell className="flex gap-2">
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            onClick={() => handleOpenEdit(tx)}>
-                            <Edit size={16} />
-                          </Button>
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            onClick={() => handleDelete(tx.id)}>
-                            <Trash size={16} />
-                          </Button>
+                        <TableCell className="text-right font-semibold text-sm">
+                          <span
+                            className={
+                              tx.type === "income"
+                                ? "text-green-600 dark:text-green-400"
+                                : "text-red-600 dark:text-red-400"
+                            }>
+                            {formatCurrency(tx.amount, displayCurrency, {
+                              rates: fxRates,
+                              baseCurrency,
+                            })}
+                          </span>
+                        </TableCell>
+                        <TableCell className="text-right">
+                          <div className="flex gap-2 justify-end">
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              onClick={() => handleOpenEdit(tx)}
+                              className="h-8 w-8 p-0">
+                              <Edit size={16} />
+                            </Button>
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              onClick={() => handleDelete(tx.id)}
+                              className="h-8 w-8 p-0 text-destructive hover:text-destructive">
+                              <Trash2 size={16} />
+                            </Button>
+                          </div>
                         </TableCell>
                       </TableRow>
                     ))}
                   </TableBody>
                 </Table>
-                <div className="flex flex-wrap items-center justify-between gap-2 text-sm text-muted-foreground">
+              </div>
+              {transactions.length > 0 && (
+                <div className="flex flex-col sm:flex-row items-center justify-between gap-4 mt-6 pt-4 border-t text-sm text-muted-foreground">
                   <div>
                     {transactionsMeta
                       ? `Page ${transactionsMeta.page} of ${totalPages}`
@@ -519,7 +576,7 @@ export default function TransactionsPage() {
                       size="sm"
                       disabled={page <= 1}
                       onClick={() => setPage((prev) => Math.max(1, prev - 1))}>
-                      Prev
+                      Previous
                     </Button>
                     <Button
                       variant="outline"
@@ -532,10 +589,10 @@ export default function TransactionsPage() {
                     </Button>
                   </div>
                 </div>
-              </div>
-            )}
-          </CardContent>
-        </Card>
+              )}
+            </CardContent>
+          </Card>
+        )}
       </div>
     </Layout>
   );

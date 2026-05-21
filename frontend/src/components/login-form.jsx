@@ -63,7 +63,7 @@ export function LoginForm({ className, ...props }) {
           <form onSubmit={handleLogin}>
             <div className="grid gap-6">
               {error ? (
-                <div className="text-sm text-red-600" role="alert">
+                <div className="text-sm text-destructive" role="alert">
                   {error}
                 </div>
               ) : null}

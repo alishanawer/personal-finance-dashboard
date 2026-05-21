@@ -20,6 +20,10 @@ import {
 } from "@/components/ui/table";
 import CategoryBreakdownChart from "@/components/charts/category-breakdown-chart";
 import MonthlyTrendChart from "@/components/charts/monthly-trend-chart";
+import { PageHeader } from "@/components/page-header";
+import { LoadingState } from "@/components/loading-state";
+import { EmptyState } from "@/components/empty-state";
+import { BarChart3 } from "lucide-react";
 
 const ranges = [
   { label: "Last 30 days", value: "30" },
@@ -158,30 +162,31 @@ export default function DashboardPage() {
   return (
     <Layout>
       <div className="p-6 space-y-6">
-        <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
-          <h1 className="text-2xl font-semibold">Dashboard</h1>
-          <Select value={range} onValueChange={setRange}>
-            <SelectTrigger className="w-48">
-              <SelectValue placeholder="Select range" />
-            </SelectTrigger>
-            <SelectContent>
-              {ranges.map((item) => (
-                <SelectItem key={item.value} value={item.value}>
-                  {item.label}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-        </div>
+        <PageHeader
+          title="Dashboard"
+          subtitle="Track your income and expenses at a glance"
+          actions={
+            <Select value={range} onValueChange={setRange}>
+              <SelectTrigger className="w-48">
+                <SelectValue placeholder="Select range" />
+              </SelectTrigger>
+              <SelectContent>
+                {ranges.map((item) => (
+                  <SelectItem key={item.value} value={item.value}>
+                    {item.label}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          }
+        />
         {error ? (
           <div className="rounded-md border border-destructive/40 bg-destructive/10 px-3 py-2 text-sm text-destructive">
             {error}
           </div>
         ) : null}
         {isLoading ? (
-          <div className="text-center text-muted-foreground py-10">
-            Loading dashboard...
-          </div>
+          <LoadingState message="Loading dashboard..." />
         ) : (
           <>
             <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
@@ -234,9 +239,11 @@ export default function DashboardPage() {
               </CardHeader>
               <CardContent>
                 {recentTransactions.length === 0 ? (
-                  <div className="text-center text-muted-foreground py-6">
-                    No recent transactions yet.
-                  </div>
+                  <EmptyState
+                    icon={BarChart3}
+                    title="No recent transactions"
+                    description="Start tracking your finances by adding a transaction."
+                  />
                 ) : (
                   <Table>
                     <TableHeader>
@@ -286,9 +293,11 @@ export default function DashboardPage() {
                 </CardHeader>
                 <CardContent>
                   {categoryTotals.length === 0 ? (
-                    <div className="text-center text-muted-foreground py-6">
-                      No category data yet.
-                    </div>
+                    <EmptyState
+                      icon={BarChart3}
+                      title="No category data"
+                      description="Create categories and add expenses to see your breakdown."
+                    />
                   ) : (
                     <CategoryBreakdownChart
                       data={categoryTotals}
@@ -305,9 +314,11 @@ export default function DashboardPage() {
                 </CardHeader>
                 <CardContent>
                   {monthlyTotals.length === 0 ? (
-                    <div className="text-center text-muted-foreground py-6">
-                      No trend data yet.
-                    </div>
+                    <EmptyState
+                      icon={BarChart3}
+                      title="No trend data"
+                      description="Add transactions to see your monthly trends."
+                    />
                   ) : (
                     <MonthlyTrendChart
                       data={monthlyTotals}
