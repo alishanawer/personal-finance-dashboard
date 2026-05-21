@@ -1,97 +1,109 @@
 # Personal Finance Dashboard
 
-A modern web application for tracking personal finances, visualizing spending patterns, and managing budgets.  
-Built with **React (Vite)**, **Tailwind CSS**, **ShadCN UI**, **FastAPI**, and **PostgreSQL**.  
+A modern, production-ready web application for tracking personal finances, visualizing spending patterns, and managing budgets. Built with React (Vite) on the frontend and FastAPI + PostgreSQL on the backend.
 
-> **Status:** 🚧 Under Development
-
----
-
-## 🔹 Features (Planned)
-
-- **Authentication & Authorization** – secure sign-up, and login.
-- **Expense Tracking** – log and categorize income & expenses.  
-- **Data Visualization** – interactive charts & insights for spending habits, categories, and trends.  
-- **Dashboard Overview** – quick glance at balances, budgets, and recent activity.  
-- **User Profile & Preferences** – customizable settings, currency support, etc.  
-- **Goals & Budgets (Future)** – set savings goals and track budget progress.  
+> **Status:** ✅ Completed
 
 ---
 
-## 🔹 Tech Stack
+## 🔹 Summary
 
-**Frontend:** [React JS](https://react.dev/) + [Vite](https://vite.dev/), [Tailwind CSS](https://tailwindcss.com/), [ShadCN UI](https://ui.shadcn.com/).  
-**Backend:** [FastAPI](https://fastapi.tiangolo.com/), [PostgreSQL](https://www.postgresql.org/)  
+- **Purpose:** Track income and expenses, manage categories and budgets, and surface insights with charts and reports.
+- **Frontend:** React + Vite, Tailwind CSS, ShadCN UI
+- **Backend:** FastAPI, PostgreSQL, Alembic migrations
 
 ---
 
-## 🔹 Installation & Setup (Dev)
+## 🔹 Implemented Features
 
-Follow these steps to run the project locally:
+- **Authentication & Authorization** – secure signup and login flows.
+- **Transactions** – create, read, update, and delete income/expense entries.
+- **Categories** – manage categories with color and icon support and unique names.
+- **Dashboard** – overview with balances, recent transactions, and quick stats.
+- **Data Visualization** – category breakdown and monthly trend charts.
+- **User Settings & Preferences** – display currency, notification preferences, and theme.
+- **Reports** – view downloadable reports and summaries.
+- **Responsive UI** – works across desktop and mobile screens.
+- **API Documentation** – FastAPI OpenAPI docs available when the backend is running at `/docs`.
 
-### 1️⃣ Clone the Repository
+---
+
+## 🔹 Installation & Local Setup
+
+Follow these steps to run the project locally.
+
+1. Clone the repository
 
 ```bash
 git clone https://github.com/alishanawer/personal-finance-dashboard.git
-```
-```bash
 cd personal-finance-dashboard
 ```
 
-### 2️⃣ Frontend Setup
+2. Frontend
+
 ```bash
 cd frontend
-```
-```bash
 npm install
-```
-```bash
 npm run dev
 ```
-Your frontend should now be running on `http://localhost:5173`
 
-### 3️⃣ Backend Setup
+Frontend dev server defaults to `http://localhost:5173`.
+
+3. Backend
+
 ```bash
 cd ../backend
-```
-- Use Python 3.11 or 3.12 (psycopg2-binary wheels are not available for Python 3.14 yet):
-- Create virtual environment:
-```bash
 python3.12 -m venv venv
-```
-- Activate virtual environment:
-```bash
-source venv/bin/activate   # On Linux/Mac
-```
-```bash
-venv\Scripts\activate      # On Windows
-```
-- Install dependencies:
-```bash
+source venv/bin/activate
 pip install -r requirements.txt
 ```
 
-### 4️⃣ Database Configuration
+4. Database
 
-This project uses PostgreSQL.
+Ensure PostgreSQL is installed and running. Create a database (example: `finance_db`) and add a `.env` in `backend/` with at least:
 
-1. Make sure `PostgreSQL` is installed and running locally.
-2. Create a new database, e.g. `finance_db`.
-3. Update your `.env` file with your own database credentials:
 ```env
 DATABASE_URL=postgresql://username:password@localhost:5432/finance_db
 SECRET_KEY=your_secret_key
 ```
-⚠️ You’ll need to create your own `.env` file in the `backend/` folder (not committed to GitHub).
 
-### 5️⃣ Run Backend Server
+Run migrations (Alembic):
+
+```bash
+alembic upgrade head
+```
+
+5. Run backend
+
 ```bash
 uvicorn app.main:app --reload
 ```
-Backend should now be running on `http://localhost:8000`
+
+Backend will be available at `http://localhost:8000` and API docs at `http://localhost:8000/docs`.
+
+---
+
+## 🔹 Production / Deployment Notes
+
+- Build frontend for production: `npm run build` in `frontend/` and serve the static assets with your preferred static server (or integrate into a Docker image).
+- Serve the backend with Uvicorn/Gunicorn behind a reverse proxy (NGINX). Configure environment variables and a managed Postgres instance for production.
+- Consider using `docker` for a reproducible deployment: build separate services for frontend and backend and a managed Postgres service.
+
+---
+
+## 🔹 Contributing
+
+This repository is in a completed state. Contributions, bug reports, and small improvements are welcome — open a PR or issue.
 
 ---
 
 ## 🔹 License
 
-This project is licensed under the `MIT License`.
+MIT License
+
+---
+
+If you'd like, I can also:
+
+- add a `RELEASE.md` or changelog entry summarizing the final features
+- create a small `deploy` guide or Docker Compose setup
